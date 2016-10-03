@@ -1,0 +1,54 @@
+//mult.vp
+//; my $bW = parameter( name=>"bitWidth", val=>8, doc=>"Width of input");
+//; my $hbW = $bW/2;
+module `mname` (
+input logic  [`$bW-1`:0] a, b,
+output logic [`(2*$bW)-1`:0] m,
+input logic clk, rst
+);
+
+logic [`$hbW-1`:0] al,am, bl, bm;
+logic [`$bW-1`:0] alxbl,amxbl, alxbm, amxbm;
+logic [`$bW-1`:0] alxbl_nxt,amxbl_nxt, alxbm_nxt, amxbm_nxt;
+logic [`(2*$bW)-1`:0] m_nxt;
+
+assign al = a[`$hbW-1`:0];
+assign am = a[`$bW-1`:`$hbW`];
+
+assign bl = b[`$hbW-1`:0];
+assign bm = b[`$bW-1`:`$hbW`];
+
+assign alxbl_nxt = al * bl;
+assign amxbl_nxt = am * bl;
+assign alxbm_nxt = al * bm;
+assign amxbm_nxt = am * bm;
+
+assign m_nxt = ( {amxbm,`$bW`'b`(0) x $bW`} +
+		 {`$hbW`'b`(0) x $hbW`,alxbm,`$hbW`'b`(0) x $hbW`} +
+		 {`$hbW`'b`(0) x $hbW`,amxbl,`$hbW`'b`(0) x $hbW`} +
+		 {`$bW`'b`(0) x $bW`,alxbl}
+		);
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M".$i);
+`$dff->instantiate()`(.din(m_nxt[`$i`]), .q(m[`$i`]), .clk(clk), .rst(rst));
+//; }
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_ALBL".$i);
+`$dff->instantiate()`(.din(alxbl_nxt[`$i`]), .q(alxbl[`$i`]), .clk(clk), .rst(rst));
+//; }
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_AMBL".$i);
+`$dff->instantiate()`(.din(amxbl_nxt[`$i`]), .q(amxbl[`$i`]), .clk(clk), .rst(rst));
+//; }
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_ALBM".$i);
+`$dff->instantiate()`(.din(alxbm_nxt[`$i`]), .q(alxbm[`$i`]), .clk(clk), .rst(rst));
+//; }
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_AMBM".$i);
+`$dff->instantiate()`(.din(amxbm_nxt[`$i`]), .q(amxbm[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+
+endmodule: `mname`

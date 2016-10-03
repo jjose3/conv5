@@ -1,0 +1,176 @@
+// conv5.vp
+//; my $bW = parameter( name=>"bitWidth", val=>8, doc=>"Width of input");
+//; my $tp = parameter( name=>"taps", val=>5, doc=>"Number of taps");
+//; my $dl = parameter( name=>"Delay", val=>4, doc=>"Sequential delay");
+module `mname` (
+input logic [`$bW-1`:0] uD,
+input logic [`$bW-1`:0] t0,
+input logic [`$bW-1`:0] t1,
+input logic [`$bW-1`:0] t2,
+input logic [`$bW-1`:0] t3,
+input logic [`$bW-1`:0] t4,
+output logic [`$bW-1`:0] fD,
+input logic clk,
+input logic rst
+);
+
+logic [`$bW-1`:0] uD0;
+logic [`$bW-1`:0] uD1;
+logic [`$bW-1`:0] uD2;
+logic [`$bW-1`:0] uD3;
+logic [`$bW-1`:0] uD4;
+logic [`$bW-1`:0] tf0;
+logic [`$bW-1`:0] tf1;
+logic [`$bW-1`:0] tf2;
+logic [`$bW-1`:0] tf3;
+logic [`$bW-1`:0] tf4;
+
+
+logic [`(2*$bW)-1`:0] uD0xt0;
+logic [`(2*$bW)-1`:0] uD1xt1;
+logic [`(2*$bW)-1`:0] uD2xt2;
+logic [`(2*$bW)-1`:0] uD3xt3;
+logic [`(2*$bW)-1`:0] uD4xt4;
+logic [`(2*$bW)-1`:0] uD0xt0_nxt;
+logic [`(2*$bW)-1`:0] uD1xt1_nxt;
+logic [`(2*$bW)-1`:0] uD2xt2_nxt;
+logic [`(2*$bW)-1`:0] uD3xt3_nxt;
+logic [`(2*$bW)-1`:0] uD4xt4_nxt;
+
+logic [`$bW-1`:0] fD_nxt;
+logic [`$bW-1`:0] sfD_nxt;
+logic [`$bW-1`:0] sfD;
+logic [`$bW-1`:0] hsfD_nxt;
+logic [`$bW-1`:0] hsfD;
+logic [2:0] carry_nxt;
+logic [2:0] carry;
+
+assign {carry_nxt, hsfD_nxt[`$bW-1`:0]} = (	uD0xt0[`$bW-1`:0] +
+					uD1xt1[`$bW-1`:0] +
+					uD2xt2[`$bW-1`:0] +
+					uD3xt3[`$bW-1`:0] +
+					uD4xt4[`$bW-1`:0] 				
+					);
+
+assign sfD_nxt[`$bW-1`:0] = (	uD0xt0[`(2*$bW)-1`:`$bW`] +
+				uD1xt1[`(2*$bW)-1`:`$bW`] +
+				uD2xt2[`(2*$bW)-1`:`$bW`] +
+				uD3xt3[`(2*$bW)-1`:`$bW`] +
+				uD4xt4[`(2*$bW)-1`:`$bW`]
+				);
+assign fD_nxt = sfD + {5'b00000, carry};
+
+//assign uD0xt0_nxt = (uD0 * tf0);
+//assign uD1xt1_nxt = (uD1 * tf1);
+//assign uD2xt2_nxt = (uD2 * tf2);
+//assign uD3xt3_nxt = (uD3 * tf3);
+//assign uD4xt4_nxt = (uD4 * tf4);
+
+//;  my $mult0 = generate_base( "mult" , "MULT0");
+`$mult0->instantiate()`(.a(uD0), .b(tf0), .m(uD0xt0_nxt), .clk(clk), .rst(rst));
+//;  my $mult1 = generate_base( "mult" , "MULT1");
+`$mult1->instantiate()`(.a(uD1), .b(tf1), .m(uD1xt1_nxt), .clk(clk), .rst(rst));
+//;  my $mult2 = generate_base( "mult" , "MULT2");
+`$mult2->instantiate()`(.a(uD2), .b(tf2), .m(uD2xt2_nxt), .clk(clk), .rst(rst));
+//;  my $mult3 = generate_base( "mult" , "MULT3");
+`$mult3->instantiate()`(.a(uD3), .b(tf3), .m(uD3xt3_nxt), .clk(clk), .rst(rst));
+//;  my $mult4 = generate_base( "mult" , "MULT4");
+`$mult4->instantiate()`(.a(uD4), .b(tf4), .m(uD4xt4_nxt), .clk(clk), .rst(rst));
+
+//; for( my $i = 0 ; $i < 3 ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_CARRY".$i);
+`$dff->instantiate()`(.din(carry_nxt[`$i`]), .q(carry[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_HSFD".$i);
+`$dff->instantiate()`(.din(hsfD_nxt[`$i`]), .q(hsfD[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_SFD".$i);
+`$dff->instantiate()`(.din(sfD_nxt[`$i`]), .q(sfD[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_FD".$i);
+`$dff->instantiate()`(.din(fD_nxt[`$i`]), .q(fD[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_MULT4".$i);
+`$dff->instantiate()`(.din(uD4xt4_nxt[`$i`]), .q(uD4xt4[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_MULT3".$i);
+`$dff->instantiate()`(.din(uD3xt3_nxt[`$i`]), .q(uD3xt3[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_MULT2".$i);
+`$dff->instantiate()`(.din(uD2xt2_nxt[`$i`]), .q(uD2xt2[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_MULT1".$i);
+`$dff->instantiate()`(.din(uD1xt1_nxt[`$i`]), .q(uD1xt1[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_MULT0".$i);
+`$dff->instantiate()`(.din(uD0xt0_nxt[`$i`]), .q(uD0xt0[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_TAP4".$i);
+`$dff->instantiate()`(.din(t4[`$i`]), .q(tf4[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_TAP3".$i);
+`$dff->instantiate()`(.din(t3[`$i`]), .q(tf3[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_TAP2".$i);
+`$dff->instantiate()`(.din(t2[`$i`]), .q(tf2[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_TAP1".$i);
+`$dff->instantiate()`(.din(t1[`$i`]), .q(tf1[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_TAP0".$i);
+`$dff->instantiate()`(.din(t0[`$i`]), .q(tf0[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_UNFILTEREDDATA0".$i);
+`$dff->instantiate()`(.din(uD[`$i`]), .q(uD0[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_UNFILTEREDDATA1".$i);
+`$dff->instantiate()`(.din(uD0[`$i`]), .q(uD1[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_UNFILTEREDDATA2".$i);
+`$dff->instantiate()`(.din(uD1[`$i`]), .q(uD2[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_UNFILTEREDDATA3".$i);
+`$dff->instantiate()`(.din(uD2[`$i`]), .q(uD3[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_UNFILTEREDDATA4".$i);
+`$dff->instantiate()`(.din(uD3[`$i`]), .q(uD4[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+endmodule: `mname`
