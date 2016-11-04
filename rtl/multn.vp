@@ -1,0 +1,286 @@
+//multn.vp
+//; my $bW = parameter( name=>"bitWidth", val=>8, doc=>"Width of input");
+//; my $qbW = $bW/4;
+//; my $hbW = $bW/2;
+//; my $sbW = $bW*3/4;
+//; my $tbW = $bW*5/4;
+//; my $twbW = $bW*3/2;
+module `mname` (
+input logic  [`$bW-1`:0] a, b,
+output logic [`(2*$bW)-1`:0] m,
+input logic clk, rst
+);
+
+logic [`$qbW-1`:0] a1,a2,a3,a4,b1,b2,b3,b4;
+logic [`$hbW-1`:0] a4xb4,a4xb3,a4xb2,a4xb1,a3xb4,a3xb3,a3xb2,a3xb1,a2xb4,a2xb3,a2xb2,a2xb1,a1xb4,a1xb3,a1xb2,a1xb1;
+logic [`$hbW-1`:0] a4xb4_nxt,a4xb3_nxt,a4xb2_nxt,a4xb1_nxt,a3xb4_nxt,a3xb3_nxt,a3xb2_nxt,a3xb1_nxt,a2xb4_nxt,a2xb3_nxt,a2xb2_nxt,a2xb1_nxt,a1xb4_nxt,a1xb3_nxt,a1xb2_nxt,a1xb1_nxt;
+logic [`(2*$bW)-1`:0] m_1,m_2,m_3,m_4,m_5,m_6,m_7,m_8,m_9,m_1_0,m_1_1,m_1_2,m_1_3,m_1_4;
+logic [`(2*$bW)-1`:0] m_1_nxt,m_2_nxt,m_3_nxt,m_4_nxt,m_5_nxt,m_6_nxt,m_7_nxt,m_8_nxt,m_9_nxt,m_1_0_nxt,m_1_1_nxt,m_1_2_nxt,m_1_3_nxt,m_1_4_nxt;
+logic [`(2*$bW)-1`:0] m;
+logic [`(2*$bW)-1`:0] m_nxt;
+
+
+assign a1 = a[`$qbW-1`:0];
+assign a2 = a[`$hbW-1`:`$qbW`];
+assign a3 = a[`$sbW-1`:`$hbW`];
+assign a4 = a[`$bW-1`:`$sbW`];
+
+assign b1 = b[`$qbW-1`:0];
+assign b2 = b[`$hbW-1`:`$qbW`];
+assign b3 = b[`$sbW-1`:`$hbW`];
+assign b4 = b[`$bW-1`:`$sbW`];
+
+
+assign a4xb4_nxt = a4 * b4;
+assign a4xb3_nxt = a4 * b3;
+assign a4xb2_nxt = a4 * b2;
+assign a4xb1_nxt = a4 * b1;
+
+assign a3xb4_nxt = a3 * b4;
+assign a3xb3_nxt = a3 * b3;
+assign a3xb2_nxt = a3 * b2;
+assign a3xb1_nxt = a3 * b1;
+
+assign a2xb4_nxt = a2 * b4;
+assign a2xb3_nxt = a2 * b3;
+assign a2xb2_nxt = a2 * b2;
+assign a2xb1_nxt = a2 * b1;
+
+assign a1xb4_nxt = a1 * b4;
+assign a1xb3_nxt = a1 * b3;
+assign a1xb2_nxt = a1 * b2;
+assign a1xb1_nxt = a1 * b1;
+
+
+//assign m_1_nxt = (      {a4xb4,`$twbW`'b`(0) x $twbW`} +
+//		 	{`$qbW`'b`(0) x $qbW`,a4xb3,`$tbW`'b`(0) x $tbW`} +
+//		 	{`$hbW`'b`(0) x $hbW`,a4xb2,`$bW`'b`(0) x $bW`} +
+//		 	{`$sbW`'b`(0) x $sbW`,a4xb1,`$sbW`'b`(0) x $sbW`}
+//		);
+//
+//assign m_2_nxt = (      {`$qbW`'b`(0) x $qbW`,a3xb4,`$tbW`'b`(0) x $tbW`} +
+//		 	{`$hbW`'b`(0) x $hbW`,a3xb3,`$bW`'b`(0) x $bW`} +
+//		 	{`$sbW`'b`(0) x $sbW`,a3xb2,`$sbW`'b`(0) x $sbW`} +
+//		 	{`$bW`'b`(0) x $bW`,a3xb1,`$hbW`'b`(0) x $hbW`}
+//		);
+//
+//assign m_3_nxt  = (     {`$hbW`'b`(0) x $hbW`,a2xb4,`$bW`'b`(0) x $bW`} +
+//		 	{`$sbW`'b`(0) x $sbW`,a2xb3,`$sbW`'b`(0) x $sbW`} +
+//		 	{`$bW`'b`(0) x $bW`,a2xb2,`$hbW`'b`(0) x $hbW`} +
+//		 	{`$tbW`'b`(0) x $tbW`,a2xb1,`$qbW`'b`(0) x $qbW`}
+//		);
+//
+//assign m_4_nxt  = (     {`$sbW`'b`(0) x $sbW`,a1xb4,`$sbW`'b`(0) x $sbW`} +
+//		 	{`$bW`'b`(0) x $bW`,a1xb3,`$hbW`'b`(0) x $hbW`} +
+//		 	{`$tbW`'b`(0) x $tbW`,a1xb2,`$qbW`'b`(0) x $qbW`} +
+//		 	{`$twbW`'b`(0) x $twbW`,a1xb1}
+//		);
+//
+
+//assign m_nxt = ( m_1 + m_2 + m_3 + m_4 );
+
+assign m_1_nxt = (      {a4xb4,`$twbW`'b`(0) x $twbW`} +
+		 	{`$qbW`'b`(0) x $qbW`,a4xb3,`$tbW`'b`(0) x $tbW`} 
+		 );
+		 
+assign m_2_nxt = (	{`$hbW`'b`(0) x $hbW`,a4xb2,`$bW`'b`(0) x $bW`} +
+		 	{`$sbW`'b`(0) x $sbW`,a4xb1,`$sbW`'b`(0) x $sbW`}
+		);
+
+assign m_3_nxt = (      {`$qbW`'b`(0) x $qbW`,a3xb4,`$tbW`'b`(0) x $tbW`} +
+		 	{`$hbW`'b`(0) x $hbW`,a3xb3,`$bW`'b`(0) x $bW`} );
+
+assign m_4_nxt = (  	{`$sbW`'b`(0) x $sbW`,a3xb2,`$sbW`'b`(0) x $sbW`} +
+		 	{`$bW`'b`(0) x $bW`,a3xb1,`$hbW`'b`(0) x $hbW`}
+		);
+
+assign m_5_nxt  = (     {`$hbW`'b`(0) x $hbW`,a2xb4,`$bW`'b`(0) x $bW`} +
+		 	{`$sbW`'b`(0) x $sbW`,a2xb3,`$sbW`'b`(0) x $sbW`} );
+
+assign m_6_nxt  = (  	{`$bW`'b`(0) x $bW`,a2xb2,`$hbW`'b`(0) x $hbW`} +
+		 	{`$tbW`'b`(0) x $tbW`,a2xb1,`$qbW`'b`(0) x $qbW`}
+		);
+assign m_7_nxt  = (     {`$sbW`'b`(0) x $sbW`,a1xb4,`$sbW`'b`(0) x $sbW`} +
+		 	{`$bW`'b`(0) x $bW`,a1xb3,`$hbW`'b`(0) x $hbW`} );
+
+assign m_8_nxt  = (  	{`$tbW`'b`(0) x $tbW`,a1xb2,`$qbW`'b`(0) x $qbW`} +
+		 	{`$twbW`'b`(0) x $twbW`,a1xb1}
+		);
+
+assign m_9_nxt  =  ( m_1 + m_2 );
+assign m_1_0_nxt  = ( m_3 + m_4 );
+assign m_1_1_nxt  = ( m_5 + m_6 );
+assign m_1_2_nxt  = ( m_7 + m_8 );
+assign m_1_3_nxt  = ( m_9 + m_1_0 );
+assign m_1_4_nxt  = ( m_1_1 + m_1_2 );
+assign m_nxt  = ( m_1_3 + m_1_4 );
+
+
+
+//assign m_nxt = ( m_1 + m_2 + m_3 + m_4 );
+
+   
+
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M".$i);
+`$dff->instantiate()`(.din(m_nxt[`$i`]), .q(m[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M_1".$i);
+`$dff->instantiate()`(.din(m_1_nxt[`$i`]), .q(m_1[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M_2".$i);
+`$dff->instantiate()`(.din(m_2_nxt[`$i`]), .q(m_2[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M_3".$i);
+`$dff->instantiate()`(.din(m_3_nxt[`$i`]), .q(m_3[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M_4".$i);
+`$dff->instantiate()`(.din(m_4_nxt[`$i`]), .q(m_4[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M_5".$i);
+`$dff->instantiate()`(.din(m_5_nxt[`$i`]), .q(m_5[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M_6".$i);
+`$dff->instantiate()`(.din(m_6_nxt[`$i`]), .q(m_6[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M_7".$i);
+`$dff->instantiate()`(.din(m_7_nxt[`$i`]), .q(m_7[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M_8".$i);
+`$dff->instantiate()`(.din(m_8_nxt[`$i`]), .q(m_8[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M_9".$i);
+`$dff->instantiate()`(.din(m_9_nxt[`$i`]), .q(m_9[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M_1_0".$i);
+`$dff->instantiate()`(.din(m_1_0_nxt[`$i`]), .q(m_1_0[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M_1_1".$i);
+`$dff->instantiate()`(.din(m_1_1_nxt[`$i`]), .q(m_1_1[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M_1_2".$i);
+`$dff->instantiate()`(.din(m_1_2_nxt[`$i`]), .q(m_1_2[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M_1_3".$i);
+`$dff->instantiate()`(.din(m_1_3_nxt[`$i`]), .q(m_1_3[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < 2*$bW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_M_1_4".$i);
+`$dff->instantiate()`(.din(m_1_4_nxt[`$i`]), .q(m_1_4[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A4B4".$i);
+`$dff->instantiate()`(.din(a4xb4_nxt[`$i`]), .q(a4xb4[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A4B3".$i);
+`$dff->instantiate()`(.din(a4xb3_nxt[`$i`]), .q(a4xb3[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A4B2".$i);
+`$dff->instantiate()`(.din(a4xb2_nxt[`$i`]), .q(a4xb2[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A4B1".$i);
+`$dff->instantiate()`(.din(a4xb1_nxt[`$i`]), .q(a4xb1[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A3B4".$i);
+`$dff->instantiate()`(.din(a3xb4_nxt[`$i`]), .q(a3xb4[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A3B3".$i);
+`$dff->instantiate()`(.din(a3xb3_nxt[`$i`]), .q(a3xb3[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A3B2".$i);
+`$dff->instantiate()`(.din(a3xb2_nxt[`$i`]), .q(a3xb2[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A3B1".$i);
+`$dff->instantiate()`(.din(a3xb1_nxt[`$i`]), .q(a3xb1[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A2B4".$i);
+`$dff->instantiate()`(.din(a2xb4_nxt[`$i`]), .q(a2xb4[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A2B3".$i);
+`$dff->instantiate()`(.din(a2xb3_nxt[`$i`]), .q(a2xb3[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A2B2".$i);
+`$dff->instantiate()`(.din(a2xb2_nxt[`$i`]), .q(a2xb2[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A2B1".$i);
+`$dff->instantiate()`(.din(a2xb1_nxt[`$i`]), .q(a2xb1[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A1B4".$i);
+`$dff->instantiate()`(.din(a1xb4_nxt[`$i`]), .q(a1xb4[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A1B3".$i);
+`$dff->instantiate()`(.din(a1xb3_nxt[`$i`]), .q(a1xb3[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A1B2".$i);
+`$dff->instantiate()`(.din(a1xb2_nxt[`$i`]), .q(a1xb2[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+//; for( my $i = 0 ; $i < $hbW ; $i++ ){
+//;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_A1B1".$i);
+`$dff->instantiate()`(.din(a1xb1_nxt[`$i`]), .q(a1xb1[`$i`]), .clk(clk), .rst(rst));
+//; }
+
+
+
+endmodule: `mname`
+

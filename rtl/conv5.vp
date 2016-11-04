@@ -66,16 +66,16 @@ assign fD_nxt = sfD + {5'b00000, carry};
 //assign uD3xt3_nxt = (uD3 * tf3);
 //assign uD4xt4_nxt = (uD4 * tf4);
 
-//;  my $mult0 = generate_base( "mult" , "MULT0");
-`$mult0->instantiate()`(.a(uD0), .b(tf0), .m(uD0xt0_nxt), .clk(clk), .rst(rst));
-//;  my $mult1 = generate_base( "mult" , "MULT1");
-`$mult1->instantiate()`(.a(uD1), .b(tf1), .m(uD1xt1_nxt), .clk(clk), .rst(rst));
-//;  my $mult2 = generate_base( "mult" , "MULT2");
-`$mult2->instantiate()`(.a(uD2), .b(tf2), .m(uD2xt2_nxt), .clk(clk), .rst(rst));
-//;  my $mult3 = generate_base( "mult" , "MULT3");
-`$mult3->instantiate()`(.a(uD3), .b(tf3), .m(uD3xt3_nxt), .clk(clk), .rst(rst));
-//;  my $mult4 = generate_base( "mult" , "MULT4");
-`$mult4->instantiate()`(.a(uD4), .b(tf4), .m(uD4xt4_nxt), .clk(clk), .rst(rst));
+//;  my $multn0 = generate_base( "multn" , "MULT0");
+`$multn0->instantiate()`(.a(uD0), .b(tf0), .m(uD0xt0_nxt), .clk(clk), .rst(rst));
+//;  my $multn1 = generate_base( "multn" , "MULT1");
+`$multn1->instantiate()`(.a(uD1), .b(tf1), .m(uD1xt1_nxt), .clk(clk), .rst(rst));
+//;  my $multn2 = generate_base( "multn" , "MULT2");
+`$multn2->instantiate()`(.a(uD2), .b(tf2), .m(uD2xt2_nxt), .clk(clk), .rst(rst));
+//;  my $multn3 = generate_base( "multn" , "MULT3");
+`$multn3->instantiate()`(.a(uD3), .b(tf3), .m(uD3xt3_nxt), .clk(clk), .rst(rst));
+//;  my $multn4 = generate_base( "multn" , "MULT4");
+`$multn4->instantiate()`(.a(uD4), .b(tf4), .m(uD4xt4_nxt), .clk(clk), .rst(rst));
 
 //; for( my $i = 0 ; $i < 3 ; $i++ ){
 //;  my $dff = generate_base( "dff" , "D_FLIP_FLOP_CARRY".$i);
